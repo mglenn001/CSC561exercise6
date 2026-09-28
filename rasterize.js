@@ -179,20 +179,34 @@ function setupShaders() {
 // render the loaded model
 function renderTriangles() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear frame/depth buffers
+
+    // Viewport transformation matrix: maps [0,1] world coords to [-1,1] WebGL clip space
+    var viewportMatrix = mat4.create();
+    mat4.fromTranslation(viewportMatrix, vec3.fromValues(-1.0, -1.0, 0.0));
+    mat4.scale(viewportMatrix, viewportMatrix, vec3.fromValues(2.0, 2.0, 1.0));
+
+    // Define transformation matrix for triangle set 0 (Triangle)
+    var m0 = mat4.create();
+    var origCenter0 = vec3.fromValues(0.25, 0.7, 0.75); // original triangle center
+    mat4.fromTranslation(m0, vec3.fromValues(0.15, 0.38, 0.75)); // target position
+    mat4.rotateZ(m0, m0, 2.2 * Math.PI / 3); // rotate 60 degrees around center
+    mat4.scale(m0, m0, vec3.fromValues(0.5, 0.5, 1.0)); // scale triangle down
+    mat4.translate(m0, m0, vec3.negate(vec3.create(), origCenter0)); // translate to local origin
     
     // define the modeling matrix for the first set 
     inputTriangles[0].mMatrix = mat4.create(); // modeling mat for tri set
-    var setCenter = vec3.fromValues(.25,.75,0);  // center coords of tri set 
-    mat4.fromTranslation(inputTriangles[0].mMatrix,vec3.negate(vec3.create(),setCenter)); // translate to origin
-    mat4.multiply(inputTriangles[0].mMatrix,
-                  mat4.fromRotation(mat4.create(),Math.PI/2,vec3.fromValues(0,0,1)),
-                  inputTriangles[0].mMatrix); // rotate 90 degs
-    mat4.multiply(inputTriangles[0].mMatrix,
-                  mat4.fromTranslation(mat4.create(),setCenter),
-                  inputTriangles[0].mMatrix); // move back to center
+    mat4.multiply(inputTriangles[0].mMatrix, viewportMatrix, m0);
         
-    // define the modeling matrix for the second set
+    // Define transformation matrix for triangle set 1 (Square)
+    var m1 = mat4.create();
+    var origCenter1 = vec3.fromValues(0.25, 0.25, 0.75); // center of square set 1
+    mat4.fromTranslation(m1, vec3.fromValues(0.38, 0.25, 0.75)); // translate rightward
+    mat4.rotateZ(m1, m1, Math.PI / 4); // rotate 45 degrees around center
+    mat4.translate(m1, m1, vec3.negate(vec3.create(), origCenter1)); // translate to local origin
+        
+    // Combine viewport transformation with model transformation
     inputTriangles[1].mMatrix = mat4.create();
+    mat4.multiply(inputTriangles[1].mMatrix, viewportMatrix, m1);
     
     for (var whichTriSet=0; whichTriSet<numTriangleSets; whichTriSet++) { 
         
