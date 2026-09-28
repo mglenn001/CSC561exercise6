@@ -189,7 +189,7 @@ function renderTriangles() {
     var m0 = mat4.create();
     var origCenter0 = vec3.fromValues(0.25, 0.7, 0.75); // original triangle center
     mat4.fromTranslation(m0, vec3.fromValues(0.15, 0.38, 0.75)); // target position
-    mat4.rotateZ(m0, m0, 2.2 * Math.PI / 3); // rotate 60 degrees around center
+    mat4.rotateZ(m0, m0, 2.25 * Math.PI / 3); // rotate 60 degrees around center
     mat4.scale(m0, m0, vec3.fromValues(0.5, 0.5, 1.0)); // scale triangle down
     mat4.translate(m0, m0, vec3.negate(vec3.create(), origCenter0)); // translate to local origin
     
